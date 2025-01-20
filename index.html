@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Forest Land</title>
+    <meta name="description" content="Hello, World! - A-Frame">
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <!-- <link src="scriptVR.js"></link> -->
+
+  </head>
+  <body>
+<script>
+      // คลิกตัวละครแล้วแสดงข้อความ
+      AFRAME.registerComponent('show-message-on-click', {
+  schema: {
+    message: {type: 'string', default: 'Hello, this is a character!'} // กำหนดข้อความเริ่มต้น
+  },
+  init: function () {
+    const el = this.el;
+
+    // สร้างกล่องข้อความ
+    const textBox = document.createElement('a-entity');
+    textBox.setAttribute('geometry', 'primitive: plane; height: 0.5; width: 2');
+    textBox.setAttribute('material', 'color: #000; opacity: 0.7');
+    textBox.setAttribute('text', `value: ${this.data.message}; align: center; color: white; width: 4`);
+    textBox.setAttribute('position', '0 2 0');
+    textBox.setAttribute('visible', 'false'); // ซ่อนข้อความไว้ก่อน
+    el.appendChild(textBox);
+
+    // เพิ่มเหตุการณ์คลิก
+    el.addEventListener('click', () => {
+      const isVisible = textBox.getAttribute('visible') === 'true';
+      textBox.setAttribute('visible', !isVisible); // แสดง/ซ่อนข้อความ
+    });
+  }
+});
+
+
+//   แสดงข้อความหลายประโยค (ข้อความเปลี่ยนเมื่อคลิก)
+AFRAME.registerComponent('show-multi-message', {
+  schema: {
+    messages: {type: 'array', default: ['Message 1', 'Message 2', 'Message 3']},
+    textPosition: {type: 'string', default: '0 2 0'} // ค่าตำแหน่งเริ่มต้นของข้อความ
+  },
+  init: function () {
+    const el = this.el;
+    let currentIndex = 0;
+
+    // สร้างกล่องข้อความ
+    const textBox = document.createElement('a-entity');
+    textBox.setAttribute('geometry', 'primitive: plane; height: 0.5; width: 3');
+    textBox.setAttribute('material', 'color: #000; opacity: 0.7');
+    textBox.setAttribute(
+      'text',
+      `value: ${this.data.messages[currentIndex]}; align: center; color: white; width: 4`
+    );
+    textBox.setAttribute('position', this.data.textPosition);  // ใช้ตำแหน่งที่กำหนด
+    textBox.setAttribute('visible', 'false');
+    el.appendChild(textBox);
+
+    // เพิ่มเหตุการณ์คลิก
+    el.addEventListener('click', () => {
+      // เปลี่ยนข้อความ
+      currentIndex = (currentIndex + 1) % this.data.messages.length;
+      textBox.setAttribute('text', `value: ${this.data.messages[currentIndex]}`);
+
+      // แสดง/ซ่อนข้อความ
+      const isVisible = textBox.getAttribute('visible') === 'true';
+      textBox.setAttribute('visible', !isVisible);
+    });
+  }
+});
+
+
+
+// กำหนดชื่ออัตโนมัติ
+      AFRAME.registerComponent('character-name', {
+      schema: {
+      name: {type: 'string', default: 'Unknown Character'},
+      height: {type: 'number', default: 2.5}
+      },
+      init: function () {
+      const nameTag = document.createElement('a-entity');
+      nameTag.setAttribute('text', `value: ${this.data.name}; align: center; color: #3366FF; width: 5`);
+      nameTag.setAttribute('position', `0 ${this.data.height} 0`);
+      this.el.appendChild(nameTag);
+        }
+      });
+
+// ทำให้ไอเทมหมุนได้
+      AFRAME.registerComponent('spin-item', {
+  schema: {
+    speed: {type: 'number', default: 30} // กำหนดความเร็วของการหมุน
+  },
+  tick: function (time, timeDelta) {
+    const rotation = this.el.getAttribute('rotation');
+    rotation.y += (this.data.speed * timeDelta) / 1000; // หมุนในแกน Y
+    this.el.setAttribute('rotation', rotation);
+  }
+});
+
+// สร้างป้ายแสดงข้อความ
+AFRAME.registerComponent('show-item-message', {
+  schema: {
+    message: {type: 'string', default: 'This is a magical item.'}
+  },
+  init: function () {
+    const el = this.el;
+
+    // สร้างป้ายข้อความ
+    const textBox = document.createElement('a-entity');
+    textBox.setAttribute('geometry', 'primitive: plane; height: 0.5; width: 2');
+    textBox.setAttribute('material', 'color: #000; opacity: 0.7');
+    textBox.setAttribute('text', `value: ${this.data.message}; align: center; color: white; width: 4`);
+    textBox.setAttribute('position', '0 1.5 0');
+    textBox.setAttribute('visible', 'false');
+    el.appendChild(textBox);
+
+    // คลิกแล้วแสดง/ซ่อนข้อความ
+    el.addEventListener('click', () => {
+      const isVisible = textBox.getAttribute('visible') === 'true';
+      textBox.setAttribute('visible', !isVisible);
+    });
+  }
+});
+</script>
+
+    <a-scene shadow="type: pcfsoft">
+      <a-assets>
+        <a-asset-item id="trees-model" src="tree/trees.glb"></a-asset-item>
+        <a-asset-item id="portal-model" src="ground/magic_portal.glb"></a-asset-item>
+
+        <a-asset-item id="ring_blue-model" src="ground/magic_ring_blue.glb"></a-asset-item>
+        <a-asset-item id="ring_red-model" src="ground/magic_ring_red.glb"></a-asset-item>
+        <a-asset-item id="ring_yellow-model" src="ground/magic_ring_yellow.glb"></a-asset-item>
+        <a-asset-item id="magic_book_blue" src="ground/magic_book.glb"></a-asset-item>
+        <a-asset-item id="magic_book_red" src="ground/magic_book (2).glb"></a-asset-item>
+        <a-asset-item id="magic_book_yellow" src="ground/magic_book3.glb"></a-asset-item>
+
+        <a-asset-item id="charater-megumin-model" src="character/megumin.glb"></a-asset-item>
+        <a-asset-item id="charater-frieren-model" src="character/Frieren.glb"></a-asset-item>
+        <a-asset-item id="charater-blacksmith-model" src="character/blacksmith_girl.glb"></a-asset-item>
+
+        <a-asset-item id="house-fairy-model" src="house/Fairy_house.glb"></a-asset-item>
+        <a-asset-item id="house-mushroom-model" src="house/mushroom__house.glb"></a-asset-item>
+        <a-asset-item id="house-whitch's_room-model" src="house/Whitch's_room.glb"></a-asset-item>
+        <a-asset-item id="house-witches_cabin-model" src="house/Witches_Cabin.glb"></a-asset-item>
+        <a-asset-item id="house-small_blacksmith-model" src="house/Norman Blacksmith.glb"></a-asset-item>
+        <a-asset-item id="house-blacksmith-model" src="house/Medieval Blacksmith.glb"></a-asset-item>
+
+        <audio id="background-music" src="sound_bg/forest-sounds-259933.mp3"></audio>
+        <audio id="ambient-sound" src="sound_bg/magic-244951.mp3"></audio>
+        <audio id="blacksmith-sound" src="sound_bg/by-ther-blacksmith-002-22317.mp3"></audio>
+        <audio id="shaking-sound" src="sound_bg/shaking-a-powder-bottle-281274.mp3"></audio>
+
+      </a-assets>
+      <!-- เสียง -->
+      <a-entity sound="src: #background-music; autoplay: true; loop: true; volume: 0.7"></a-entity>>
+      <!-- เพิ่มเสียงที่ลดระดับเมื่อออกห่าง -->
+      <a-entity position="0.75 1 -20" sound="src: #ambient-sound; autoplay: true; loop: true; volume: 0.5; 
+      distanceModel: linear; maxDistance: 7; refDistance: 5"></a-entity>
+      <a-entity position="-12 1.5 -25" sound="src: #ambient-sound; autoplay: true; loop: true; volume: 0.5; 
+      distanceModel: linear; maxDistance: 7; refDistance: 5"></a-entity>
+      <a-entity position="-7 1.5 -25" sound="src: #ambient-sound; autoplay: true; loop: true; volume: 0.5; 
+      distanceModel: linear; maxDistance: 7; refDistance: 5"></a-entity>
+
+      <a-entity position="15 1 -20" sound="src: #blacksmith-sound; autoplay: true; loop: true; volume: 0.7; 
+      distanceModel: linear; maxDistance: 7; refDistance: 5"></a-entity>
+      <a-entity position="-15 0 -20" sound="src: #shaking-sound; autoplay: true; loop: true; volume: 0.2; 
+      distanceModel: linear; maxDistance: 7; refDistance: 5"></a-entity>
+
+      <a-camera>
+        <a-cursor></a-cursor>
+      </a-camera>
+
+      <a-entity oculus-touch-controls="hand: left"></a-entity>
+      <a-entity oculus-touch-controls="hand: right"></a-entity>
+
+
+      <a-sky src="sky/sky-night.jpg"></a-sky>
+      <a-plane position="0 0 0" rotation="-90 0 0" width="200" height="200" src="ground/green-grass.jpg" repeat="20 20" shadow> </a-plane>
+      <!-- แสง -->
+      <a-light type="directional" position="5 10 -10" castShadow="true" intensity="1"></a-light>
+      <a-entity light="color: #CCFFFF; intensity: 1.5" position="5 1 32"></a-entity>
+      <a-entity light="color: #33CCFF; intensity: 1.0" position="-5 1 32" rotation="0 90 0"></a-entity>
+
+      <!-- ฉาก -->
+      <a-entity gltf-model="#trees-model" position="35 0 -20" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity gltf-model="#trees-model" position="-35 0 -20" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity gltf-model="#trees-model" position="0 0 -50" scale="0.5 0.5 0.5" rotation="0 90 0"></a-entity>
+      <a-entity gltf-model="#trees-model" position="0 0 20" scale="0.5 0.5 0.5" rotation="0 90 0"></a-entity>
+      <a-entity gltf-model="#trees-model" position="3 0 22" scale="0.5 0.5 0.5" rotation="0 90 0"></a-entity>
+      <a-entity gltf-model="#portal-model" position="-5 0 15" scale="25 25 25"></a-entity>
+
+      <!-- หนังสือ -->
+       
+      <a-entity gltf-model="#ring_blue-model" position="0.75 -0.1 -20" scale="1 1 1" spin-item="speed: 30"></a-entity>
+      <a-entity gltf-model="#ring_red-model" position="-12 -0.1 -25" scale="1 1 1" spin-item="speed: 30"></a-entity>
+      <a-entity gltf-model="#ring_yellow-model" position="-7 -0.1 -25" scale="1 1 1" spin-item="speed: 30"></a-entity>
+      
+      <a-entity gltf-model="#magic_book_blue" position="0.75 1 -20" scale=" 0.5 0.5 0.5 " spin-item="speed: 25" show-item-message="message: Magical Ice Book"></a-entity>
+      <a-entity gltf-model="#magic_book_red" position="-12 1.5 -25" scale="0.5 0.5 0.5 " spin-item="speed: 25" rotation="20 0 70 "
+      show-item-message="message: Fire Magic Book"></a-entity>
+      <a-entity gltf-model="#magic_book_yellow" position="-7 1.5 -25" scale="0.5 0.5 0.5 " spin-item="speed: 25" 
+      show-item-message="message: Light Magic Book"></a-entity>
+
+
+      <!-- บ้าน -->
+      <a-entity gltf-model="#house-fairy-model" position="-15 0 -10" scale="1 1 1"></a-entity>
+      <a-entity gltf-model="#house-mushroom-model" position="15 0 -12" scale="1 1 1" rotation="0 180 0"></a-entity>
+      <a-entity gltf-model="#house-whitch's_room-model" position="-15 0 -20" scale="0.5 0.5 0.5" rotation="0 270 0"></a-entity>
+      <a-entity gltf-model="#house-witches_cabin-model" position="-2 0.1 -25" scale="1 1 1" rotation="0 0 0"></a-entity>
+      <a-entity gltf-model="#house-small_blacksmith-model" position="5 -0.5 -25" scale="20 20 20" rotation="0 0 0"></a-entity>
+      <a-entity gltf-model="#house-blacksmith-model" position="15 1 -20" scale="1 1 1" rotation="0 270 0"></a-entity>
+
+
+
+      
+      <!-- ตัวละคร -->
+      <a-entity position="1 0 -5" character-name="name: Megumin; height: 3">
+        <a-entity gltf-model="#charater-megumin-model" position="0 0 0" scale="2.5 2.5 2.5" rotation="0 0 0" 
+          show-multi-message="messages: ['Hello! I am the village mage.', 'You can come to our village.', 'Wish you safe travels.']; textPosition: 0 1.15 0">
+        </a-entity>
+      </a-entity>
+      
+      
+      <a-entity position="-9 0 -10" character-name="name: Frieren; height: 2.5" rotation="0 60 0">
+        <a-entity gltf-model="#charater-frieren-model" position="0 0 0" scale="1.5 1.4 1.5" rotation="0 0 0"
+        show-multi-message="messages: ['Hello! I'm a mage and the village chief. \n How can I help you?.', 'You can stay overnight here..', 'Wish you safe travels.']; textPosition: 0 2 0">
+        </a-entity>
+      </a-entity>
+
+      <a-entity position="5 0 -22" character-name="name: Blacksmith; height: 2.5" >
+        <a-entity gltf-model="#charater-blacksmith-model" position="0 0 0"  scale="0.6 0.6 0.6" rotation="0 0 0" 
+        show-multi-message="messages: ['Hello! I'm a blacksmith. Can I help you?.', 'Are you interested in buying equipment from me?.', 'Let's meet again next time..']; textPosition: 0 3.5 1">
+        </a-entity>
+      </a-entity>
+      
+    
+
+      
+
+      
+    </a-scene>
+    
+
+  </body>
+</html>
